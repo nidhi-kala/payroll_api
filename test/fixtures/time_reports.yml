@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  date: 2024-05-29
+  hours_worked: 9.99
+  employee_id: 1
+  job_group: MyString
+  report_id: 1
+
+two:
+  date: 2024-05-29
+  hours_worked: 9.99
+  employee_id: 1
+  job_group: MyString
+  report_id: 1

@@ -10,6 +10,5 @@ class TimeReportsController < ApplicationController
 
     filename = file.original_filename
     id = filename.match(/-(\d+)\./).captures.first.to_i
-    binding.pry
   end
 end
