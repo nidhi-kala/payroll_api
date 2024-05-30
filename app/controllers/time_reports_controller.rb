@@ -12,17 +12,21 @@ class TimeReportsController < ApplicationController
 
     filename = file.original_filename
     id = filename.match(/-(\d+)\./).captures.first.to_i
-
+    report = TimeReport.new(report_id: id)
+    
+    if report.save
     # todo: check if report id already exists here and return error
-
     CSV.foreach file.tempfile, headers: true do |row|
-      TimeReport.create!(
-        report_id: id,
+      Timesheet.create!(
+        time_report: report,
         date: row["date"], 
         hours_worked: row["hours worked"],
         employee_id: row["employee id"],
         job_group: row["job group"]
        )
+    end
+    else
+      render json: { error: report.errors.full_messages.to_sentence}, status: :unprocessable_entity
     end
   end
 end
