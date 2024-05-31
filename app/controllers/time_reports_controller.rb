@@ -29,4 +29,10 @@ class TimeReportsController < ApplicationController
       render json: { error: report.errors.full_messages.to_sentence}, status: :unprocessable_entity
     end
   end
+
+  def payroll_report
+    reports = Timesheet.all
+    render json:{message: "this is the payroll rpeort",
+  report: reports}
+  end
 end
