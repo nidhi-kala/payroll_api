@@ -35,4 +35,18 @@ class TimeReportsController < ApplicationController
     render json:{message: "this is the payroll rpeort",
   report: reports}
   end
+
+  private
+
+  def get_pay_period(date)
+    date <= 15 ? {startDate: date.beginning_of_month, endDate: date.change(day: 15)}: {startDate = date.change(day: 16), endDate = date.end_of_month }
+  end
+
+  def hourly_rate(job_group)
+    case job_group
+      when 'A' then 20
+      when 'B' then 30
+      else 0
+    end
+  end
 end
