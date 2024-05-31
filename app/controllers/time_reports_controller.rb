@@ -31,15 +31,27 @@ class TimeReportsController < ApplicationController
   end
 
   def payroll_report
-    reports = Timesheet.all
-    render json:{message: "this is the payroll rpeort",
-  report: reports}
+    timesheets = Timesheet.all
+    report_data = {}
+
+    timesheets.each do |timesheet|
+      employee_id = timesheet.employee_id
+      pay_period = get_pay_period(timesheet.date)
+      amount_paid = timesheet.hours_worked * hourly_rate(timesheet.job_group)
+
+      report_data[employee_id] ||= {}
+      report_data[employee_id][pay_period] ||= 0
+      report_data[employee_id][pay_period] += amount_paid
+
+    end
+    formatted_report_data = format_report_data(report_data)
+    render json:{ payrollReport: { employeeReports: formatted_report_data } }
   end
 
   private
 
   def get_pay_period(date)
-    date <= 15 ? {startDate: date.beginning_of_month, endDate: date.change(day: 15)}: {startDate = date.change(day: 16), endDate = date.end_of_month }
+    date.day <= 15 ? {startDate: date.beginning_of_month, endDate: date.change(day: 15)}: {startDate: date.change(day: 16), endDate: date.end_of_month }
   end
 
   def hourly_rate(job_group)
@@ -48,5 +60,25 @@ class TimeReportsController < ApplicationController
       when 'B' then 30
       else 0
     end
+  end
+
+ def format_report_data(report_data)
+    formatted_data = []
+
+    report_data.each do |employee_id, periods|
+      periods.each do |period, amount|
+        formatted_data << {
+          employeeId: employee_id.to_s,
+          payPeriod: {
+            startDate: period[:startDate].strftime('%Y-%m-%d'),
+            endDate: period[:endDate].strftime('%Y-%m-%d')
+          },
+          amountPaid: "$%.2f" % amount
+        }
+      end
+    end
+
+    # Sorting by employeeId and payPeriod startDate
+    formatted_data.sort_by { |data| [data[:employeeId].to_i, data[:payPeriod][:startDate]] }
   end
 end
